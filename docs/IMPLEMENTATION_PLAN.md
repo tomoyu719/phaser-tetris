@@ -87,16 +87,16 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
 ## フェーズ 2: 定数とデータ構造の定義
 
 ### 2.1 定数定義 (`constants.ts`)
-- [ ] ゲーム設定定数
+- [x] ゲーム設定定数
   - `BOARD_WIDTH = 10`
   - `BOARD_HEIGHT = 20`
   - `CELL_SIZE = 32`
   - `DROP_INTERVAL = 1000`
   - `SOFT_DROP_INTERVAL = 50`
   - `LOCK_DELAY = 1` (フレーム数: 着地後、次フレームで固定)
-- [ ] スコアテーブル
+- [x] スコアテーブル
   - `SCORE_TABLE = { 1: 100, 2: 300, 3: 500, 4: 800 }`
-- [ ] テトリミノ定義（7種類の形状と色）
+- [x] テトリミノ定義（7種類の形状と色）
   - I: シアン (0x00ffff)
   - O: 黄色 (0xffff00)
   - T: 紫 (0x800080)
