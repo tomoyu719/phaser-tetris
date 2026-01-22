@@ -10,6 +10,10 @@ export const SOFT_DROP_INTERVAL = 50;
 // Lock delay (in frames - 着地後、次フレームで固定)
 export const LOCK_DELAY = 1;
 
+// Spawn position (テトリミノ出現位置)
+export const SPAWN_X = 3;
+export const SPAWN_Y = 0;
+
 // Score table
 export const SCORE_TABLE: Record<number, number> = {
   1: 100,

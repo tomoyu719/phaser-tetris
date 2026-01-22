@@ -110,7 +110,7 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
 ## フェーズ 3: コアロジックの実装（TDD）
 
 ### 3.1 Tetromino クラス (`objects/Tetromino.ts`) - Phaser非依存
-- [ ] テスト: `Tetromino.test.ts` の作成
+- [x] テスト: `Tetromino.test.ts` の作成
   - 初期化テスト（形状、位置、色）
   - 左移動テスト
   - 右移動テスト
@@ -119,7 +119,7 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
   - 右回転テスト（形状変化の確認）
   - **回転キャンセルテスト（undoRotateで元の形状に戻る）**
   - 形状取得テスト
-- [ ] 実装: `Tetromino.ts`
+- [x] 実装: `Tetromino.ts`
   - `constructor(type)`: テトリミノ生成
   - `moveLeft()`: 左移動
   - `moveRight()`: 右移動
@@ -132,7 +132,7 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
   - `getColor()`: 色取得
 
 ### 3.2 Board クラス (`objects/Board.ts`) - Phaser非依存
-- [ ] テスト: `Board.test.ts` の作成
+- [x] テスト: `Board.test.ts` の作成
   - 初期化テスト（空のボード）
   - 衝突判定テスト（壁、床、他ブロック）
   - **回転後の衝突判定テスト（壁際で回転→衝突検知）**
@@ -144,7 +144,7 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
     - 盤面上端でのテトリミノ固定（Y=0付近での固定が正しく動作）
     - ライン消去後の落下整合（消去後、上のブロックが正しく落下）
     - 複数ライン同時消去後の盤面整合性
-- [ ] 実装: `Board.ts`
+- [x] 実装: `Board.ts`
   - `constructor()`: 10x20の空ボード生成
   - `checkCollision(tetromino, offsetX, offsetY)`: 衝突判定
     - ※ 回転後のtetrominoをそのまま渡せば回転衝突判定として機能
@@ -154,7 +154,7 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
   - `getGrid()`: ボード状態取得（描画用）
 
 ### 3.3 GameLogic クラス (`objects/GameLogic.ts`) - Phaser非依存
-- [ ] テスト: `GameLogic.test.ts` の作成
+- [x] テスト: `GameLogic.test.ts` の作成
   - **スコア計算テスト**
     - 1ライン消去 → 100点
     - 2ライン消去 → 300点
@@ -177,7 +177,21 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
       expect(logic.getNextTetrominoType()).toBe('O');
       ```
     - 同じRNGで同じ順序が再現されることを確認
-- [ ] 実装: `GameLogic.ts`
+    - **RNGマッピング定義**:
+      ```
+      index = Math.floor(rng() * 7)
+      ALL_TETROMINO_TYPES = ['I', 'O', 'T', 'S', 'Z', 'J', 'L']
+      
+      rng値 → index → Type
+      0.00-0.14 → 0 → I
+      0.14-0.28 → 1 → O
+      0.28-0.42 → 2 → T
+      0.42-0.57 → 3 → S
+      0.57-0.71 → 4 → Z
+      0.71-0.85 → 5 → J
+      0.85-1.00 → 6 → L
+      ```
+- [x] 実装: `GameLogic.ts`
   - **`constructor(options?: { rng?: () => number })`**: RNG注入可能
     ```typescript
     // 使用例
@@ -196,7 +210,7 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
   - `peekNextTetrominoType(): TetrominoType`: 次のテトリミノを覗き見（UI表示用）
 
 ### 3.4 BlockRenderer クラス (`objects/BlockRenderer.ts`) - テスト対象外
-- [ ] 実装: `BlockRenderer.ts`（Phaser Graphics APIを使用）
+- [x] 実装: `BlockRenderer.ts`（Phaser Graphics APIを使用）
   - `drawBlock(graphics, x, y, color)`: 単一ブロック描画
   - `drawTetromino(graphics, tetromino)`: テトリミノ描画
   - `drawBoard(graphics, board)`: ボード全体描画
@@ -247,6 +261,8 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
     3. 毎フレーム gameLogic.updateLockDelay() を呼び出し
     4. true が返ったら固定実行 → gameLogic.resetLockState()
     ```
+    > **注意**: `updateLockDelay()` は Phaser の `update()` メソッド内で
+    > 毎フレーム呼び出すこと。`LOCK_DELAY=1` の場合、着地後の次フレームで固定される。
   - テトリミノ固定（board.lockTetromino）
   - ライン消去（board.clearLines）
   - **スコア更新**（`gameLogic.addScore(linesCleared)`）
