@@ -19,7 +19,7 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
 ┌─────────────────────────┐      ┌─────────────────────────┐
 │  Board.ts               │ ←使用─ │  GameScene.ts           │
 │  Tetromino.ts           │      │  TitleScene.ts          │
-│  GameLogic.ts (※新規)   │      │  GameOverScene.ts       │
+│  GameLogic.ts (※新規)   │      │  (GameOverはオーバーレイ)  │
 │  (Phaser依存なし)        │      │  BlockRenderer.ts       │
 └─────────────────────────┘      │  (Phaser依存)            │
          ↑                       └─────────────────────────┘
@@ -46,7 +46,7 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
 - シーン: Canvas/タイマー/入力のみ依存（ロジックはGameLogicに委譲）
 
 **E2Eスモークテスト（Playwright）:**
-- シーン遷移の結線確認（Title → Game → GameOver → Title）
+- シーン遷移の結線確認（Title → Game → GameOverオーバーレイ → Game再起動）
 - 基本動作の疎通確認（起動、入力応答、画面遷移）
 
 ---
@@ -249,12 +249,15 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
   - **次のテトリミノ生成**（`gameLogic.getNextTetrominoType()`）
 - [ ] ゲームオーバー判定とシーン遷移
 
-### 4.3 GameOverScene (`scenes/GameOverScene.ts`)
-- [ ] シーンの基本構造
+### 4.3 ゲームオーバー表示（GameScene内オーバーレイ）
+- [ ] オーバーレイ表示の実装（半透明黒背景）
 - [ ] 「GAME OVER」テキスト表示
 - [ ] 最終スコア表示
 - [ ] リトライ案内テキスト表示（"PRESS SPACE TO RETRY"）
-- [ ] スペースキー入力でTitleSceneへ遷移
+- [ ] スペースキー入力で**GameSceneを再起動**（即リトライ）
+
+> **設計変更**: 別シーン（GameOverScene.ts）ではなく、GameScene内でオーバーレイ表示する方式に変更。
+> ゲーム終了時の盤面を背景に見せることで、達成感・悔しさを演出できる。
 
 ---
 
@@ -287,8 +290,8 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
     1. ゲーム起動 → タイトル画面が表示される
     2. スペースキー → GameSceneに遷移
     3. テトリミノが表示・落下する
-    4. 意図的にゲームオーバー → GameOverSceneに遷移
-    5. スペースキー → TitleSceneに戻る
+    4. 意図的にゲームオーバー → オーバーレイ表示
+    5. スペースキー → GameSceneが再起動（即リトライ）
     ```
   - 目的: シーン間の結線ミス早期検知
   - 実行: `npm run test:e2e`（CI統合可能）
@@ -311,9 +314,8 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
 6. GameLogic クラス (TDD) ← Phaser非依存、スコア/ロックディレイ/次ピース
 7. BlockRenderer クラス ← テスト対象外
 8. TitleScene ← 手動テスト
-9. GameScene ← 手動テスト（ロジックはGameLogicに委譲済）
-10. GameOverScene ← 手動テスト
-11. 統合・仕上げ
+9. GameScene（ゲームオーバーオーバーレイ含む） ← 手動テスト（ロジックはGameLogicに委譲済）
+10. 統合・仕上げ
 ```
 
 ---
@@ -342,3 +344,4 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
 | 2025-01-21 | 1.4 | GameLogic.ts追加（スコア計算、ロックディレイ、次ピース生成をTDD対象に） |
 | 2025-01-21 | 1.5 | GameLogicにRNG注入設計を追加（テストの決定論的実行を保証） |
 | 2025-01-21 | 1.6 | Board境界条件テスト追加、E2Eスモークテスト（Playwright）計画追加 |
+| 2025-01-22 | 1.7 | GameOverをオーバーレイ方式に変更、リトライ時はGameScene直接再起動に変更 |
