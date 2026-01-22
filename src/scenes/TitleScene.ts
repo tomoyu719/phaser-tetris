@@ -6,6 +6,7 @@ export class TitleScene extends Phaser.Scene {
   }
 
   create(): void {
+    document.body.setAttribute('data-scene', 'title');
     const { width, height } = this.scale;
 
     // タイトルテキスト

@@ -34,6 +34,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    document.body.setAttribute('data-scene', 'game');
     this.initGame();
     this.setupInput();
     this.setupUI();
@@ -42,17 +43,37 @@ export class GameScene extends Phaser.Scene {
   }
 
   private initGame(): void {
+    document.body.setAttribute('data-game-state', 'playing');
+
     this.board = new Board();
-    this.gameLogic = new GameLogic();
     this.blockRenderer = new BlockRenderer();
     this.isGameOver = false;
     this.isSoftDropping = false;
+
+    // テスト用: URLパラメータでRNGシード指定可能
+    const params = new URLSearchParams(window.location.search);
+    const seedParam = params.get('seed');
+    if (seedParam) {
+      const seed = parseInt(seedParam, 10);
+      this.gameLogic = new GameLogic({ rng: this.seededRandom(seed) });
+    } else {
+      this.gameLogic = new GameLogic();
+    }
 
     // 描画用Graphics
     this.graphics = this.add.graphics();
 
     // 次のテトリミノを取得して現在のテトリミノを生成
     this.spawnTetromino();
+  }
+
+  // シード付き乱数生成器（E2Eテスト用）
+  private seededRandom(seed: number): () => number {
+    let currentSeed = seed;
+    return () => {
+      currentSeed = (currentSeed * 1103515245 + 12345) & 0x7fffffff;
+      return currentSeed / 0x7fffffff;
+    };
   }
 
   private setupUI(): void {
@@ -278,6 +299,7 @@ export class GameScene extends Phaser.Scene {
 
   private triggerGameOver(): void {
     this.isGameOver = true;
+    document.body.setAttribute('data-game-state', 'gameover');
     if (this.dropTimer) {
       this.dropTimer.destroy();
     }
