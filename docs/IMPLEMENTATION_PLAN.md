@@ -224,20 +224,21 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
 ## フェーズ 4: シーンの実装（手動テスト）
 
 ### 4.1 TitleScene (`scenes/TitleScene.ts`)
-- [ ] シーンの基本構造
-- [ ] タイトルテキスト表示（"TETRIS"）
-- [ ] 開始案内テキスト表示（"PRESS SPACE TO START"）
-- [ ] スペースキー入力でGameSceneへ遷移
+- [x] シーンの基本構造
+- [x] タイトルテキスト表示（"TETRIS"）
+- [x] 開始案内テキスト表示（"PRESS SPACE TO START"）
+- [x] スペースキー入力でGameSceneへ遷移
 
 ### 4.2 GameScene (`scenes/GameScene.ts`)
-- [ ] シーンの基本構造
-- [ ] **GameLogicインスタンスの保持**（スコア、ロックディレイ、次ピース管理を委譲）
-- [ ] ゲームフィールド描画（320x640px）
-- [ ] UIエリア描画（NEXT、SCORE）
-- [ ] テトリミノ生成・管理
-  - `gameLogic.getNextTetrominoType()` で次のテトリミノ取得
+- [x] シーンの基本構造
+- [x] **GameLogicインスタンスの保持**（スコア、ロックディレイ、次ピース管理を委譲）
+- [x] ゲームフィールド描画（320x640px）
+- [x] UIエリア描画（NEXT、SCORE）
+  - **NEXT表示には `gameLogic.peekNextTetrominoType()` を使用**（消費しない覗き見）
+- [x] テトリミノ生成・管理
+  - **生成時は `gameLogic.getNextTetrominoType()` で取得**（消費して次を準備）
   - 現在のテトリミノ管理
-- [ ] 入力処理
+- [x] 入力処理
   - 左矢印: 左移動（衝突時は無視）
   - 右矢印: 右移動（衝突時は無視）
   - 下矢印: ソフトドロップ
@@ -249,10 +250,17 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
     2. board.checkCollision(tetromino, 0, 0) で衝突判定
     3. 衝突あり → tetromino.undoRotate() でキャンセル
     4. 衝突なし → 回転確定
+    5. 移動/回転が成功し、下方向に移動可能になった場合 → gameLogic.onFloated() で着地状態解除
     ```
-- [ ] ゲームループ実装
+  - **着地状態解除の判定:**
+    - 左右移動・回転が成功した後、`board.checkCollision(tetromino, 0, 1)` で下移動可能か確認
+    - 下移動可能（衝突なし）なら `gameLogic.onFloated()` を呼び出す
+- [x] ゲームループ実装
   - 自動落下（1000ms間隔）
   - ソフトドロップ（50ms間隔）
+    - **継続入力方式**: 下キーを押している間のみ50ms間隔で落下
+    - **キーリリース時**: 1000ms間隔に復帰
+    - **実装**: `cursors.down.isDown` で押下状態を監視し、落下タイマーの間隔を切り替え
   - 衝突判定（下方向）
   - **ロックディレイ処理**（GameLogicに委譲）
     ```
@@ -267,14 +275,14 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
   - ライン消去（board.clearLines）
   - **スコア更新**（`gameLogic.addScore(linesCleared)`）
   - **次のテトリミノ生成**（`gameLogic.getNextTetrominoType()`）
-- [ ] ゲームオーバー判定とシーン遷移
+- [x] ゲームオーバー判定とオーバーレイ表示
 
 ### 4.3 ゲームオーバー表示（GameScene内オーバーレイ）
-- [ ] オーバーレイ表示の実装（半透明黒背景）
-- [ ] 「GAME OVER」テキスト表示
-- [ ] 最終スコア表示
-- [ ] リトライ案内テキスト表示（"PRESS SPACE TO RETRY"）
-- [ ] スペースキー入力で**GameSceneを再起動**（即リトライ）
+- [x] オーバーレイ表示の実装（半透明黒背景）
+- [x] 「GAME OVER」テキスト表示
+- [x] 最終スコア表示
+- [x] リトライ案内テキスト表示（"PRESS SPACE TO RETRY"）
+- [x] スペースキー入力で**GameSceneを再起動**（即リトライ）
 
 > **設計変更**: 別シーン（GameOverScene.ts）ではなく、GameScene内でオーバーレイ表示する方式に変更。
 > ゲーム終了時の盤面を背景に見せることで、達成感・悔しさを演出できる。
@@ -286,7 +294,7 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
 ### 5.1 設定ファイル整備
 - [ ] `config.ts` の完成
   - ゲームサイズ設定（フィールド + UI）
-  - シーン登録（Title, Game, GameOver）
+  - シーン登録（Title, Game）※GameOverはオーバーレイ方式のため不要
   - 背景色設定
 
 ### 5.2 エントリーポイント整備

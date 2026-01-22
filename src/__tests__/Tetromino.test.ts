@@ -139,7 +139,6 @@ describe('Tetromino', () => {
 
     it('should only undo the most recent rotation (single undo)', () => {
       const tetromino = new Tetromino('T');
-      const state0 = TETROMINO_SHAPES['T'][0];
       const state1 = TETROMINO_SHAPES['T'][1];
       const state2 = TETROMINO_SHAPES['T'][2];
 
