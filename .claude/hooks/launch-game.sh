@@ -5,7 +5,8 @@ PORT=5173
 
 # ポートが使用中かチェック
 if lsof -i :$PORT > /dev/null 2>&1; then
-    # サーバーは既に起動中
+    # サーバーは既に起動中 → ブラウザだけ開く
+    open "http://localhost:$PORT"
     exit 0
 fi
 
