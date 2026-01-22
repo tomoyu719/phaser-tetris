@@ -54,29 +54,33 @@ PhaserシーンはCanvas API、WebGL、タイマーに依存しており、Jest�
 ## フェーズ 1: プロジェクト基盤整備
 
 ### 1.1 テスト環境セットアップ
-- [ ] Jestのインストールと設定
+- [x] Jestのインストールと設定
   ```bash
-  npm install -D jest ts-jest @types/jest jest-environment-jsdom
+  npm install -D jest ts-jest @types/jest
   ```
-- [ ] `jest.config.js` の作成
+- [x] `jest.config.js` の作成（ESM対応版）
   ```javascript
-  module.exports = {
-    preset: 'ts-jest',
-    testEnvironment: 'node',  // 純粋ロジックのみなのでnodeで十分
+  export default {
+    preset: 'ts-jest/presets/default-esm',
+    testEnvironment: 'node',
     roots: ['<rootDir>/src'],
     testMatch: ['**/__tests__/**/*.test.ts'],
+    extensionsToTreatAsEsm: ['.ts'],
+    transform: {
+      '^.+\\.ts$': ['ts-jest', { useESM: true }],
+    },
   };
   ```
-- [ ] `src/__tests__/` ディレクトリの作成
-- [ ] サンプルテストの作成と動作確認
-- [ ] `package.json` に `"test": "jest"` スクリプト追加
+- [x] `src/__tests__/` ディレクトリの作成
+- [x] サンプルテストの作成と動作確認
+- [x] `package.json` に `"test": "jest"` スクリプト追加
 
 ### 1.2 プロジェクト構造の整備
-- [ ] `src/config.ts` の作成（Phaser設定を分離）
-- [ ] `src/constants.ts` の作成（定数ファイル）
-- [ ] `src/scenes/` ディレクトリの作成
-- [ ] `src/objects/` ディレクトリの作成
-- [ ] `src/main.ts` のリファクタリング（HelloScene削除、config参照）
+- [x] `src/config.ts` の作成（Phaser設定を分離）
+- [x] `src/constants.ts` の作成（定数ファイル）
+- [x] `src/scenes/` ディレクトリの作成
+- [x] `src/objects/` ディレクトリの作成
+- [x] `src/main.ts` のリファクタリング（HelloScene削除、config参照）
 
 ---
 
