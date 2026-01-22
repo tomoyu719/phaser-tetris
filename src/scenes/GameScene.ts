@@ -204,13 +204,13 @@ export class GameScene extends Phaser.Scene {
       // 衝突したら戻す
       this.currentTetromino.moveUp();
       // 着地状態
-      this.gameLogic.onLanded();
+      this.gameLogic.onLanded(this.time.now);
     } else {
       // 移動成功、浮いている場合はリセット
       if (!this.board.checkCollision(this.currentTetromino, 0, 1)) {
         this.gameLogic.onFloated();
       } else {
-        this.gameLogic.onLanded();
+        this.gameLogic.onLanded(this.time.now);
       }
     }
 
@@ -221,7 +221,7 @@ export class GameScene extends Phaser.Scene {
     if (this.isGameOver) return;
 
     // ロックディレイ処理
-    if (this.gameLogic.updateLockDelay()) {
+    if (this.gameLogic.updateLockDelay(this.time.now)) {
       this.lockAndSpawn();
     }
   }

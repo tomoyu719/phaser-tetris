@@ -7,8 +7,8 @@ export const CELL_SIZE = 32;
 export const DROP_INTERVAL = 1000;
 export const SOFT_DROP_INTERVAL = 50;
 
-// Lock delay (in frames - 着地後、次フレームで固定)
-export const LOCK_DELAY = 1;
+// Lock delay (in milliseconds - 着地後500msで固定)
+export const LOCK_DELAY = 500;
 
 // Spawn position (テトリミノ出現位置)
 export const SPAWN_X = 3;

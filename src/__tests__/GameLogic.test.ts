@@ -1,5 +1,5 @@
 import { GameLogic } from '../objects/GameLogic';
-import { SCORE_TABLE, LOCK_DELAY, ALL_TETROMINO_TYPES, TetrominoType } from '../constants';
+import { SCORE_TABLE, ALL_TETROMINO_TYPES, TetrominoType } from '../constants';
 
 describe('GameLogic', () => {
   describe('score calculation', () => {
@@ -72,61 +72,58 @@ describe('GameLogic', () => {
 
     it('should set isLanded = true after onLanded()', () => {
       const logic = new GameLogic();
-      logic.onLanded();
+      logic.onLanded(1000);
       expect(logic.isLanded()).toBe(true);
     });
 
     it('should reset isLanded after onFloated()', () => {
       const logic = new GameLogic();
-      logic.onLanded();
+      logic.onLanded(1000);
       logic.onFloated();
       expect(logic.isLanded()).toBe(false);
     });
 
-    it('should increment lock counter when landed', () => {
+    it('should return false before LOCK_DELAY elapsed', () => {
       const logic = new GameLogic();
-      logic.onLanded();
-      expect(logic.updateLockDelay()).toBe(LOCK_DELAY === 1); // Returns true when counter >= LOCK_DELAY
+      logic.onLanded(1000);
+      // 499ms経過 → まだロックしない
+      expect(logic.updateLockDelay(1499)).toBe(false);
     });
 
-    it('should return shouldLock = true after LOCK_DELAY frames', () => {
+    it('should return shouldLock = true after LOCK_DELAY ms', () => {
       const logic = new GameLogic();
-      logic.onLanded();
-      
-      // Simulate frames
-      let shouldLock = false;
-      for (let i = 0; i < LOCK_DELAY; i++) {
-        shouldLock = logic.updateLockDelay();
-      }
-      expect(shouldLock).toBe(true);
+      logic.onLanded(1000);
+      // 500ms経過 → ロックする
+      expect(logic.updateLockDelay(1500)).toBe(true);
     });
 
-    it('should reset lock counter after onFloated()', () => {
+    it('should reset lock start time after onFloated()', () => {
       const logic = new GameLogic();
-      logic.onLanded();
-      logic.updateLockDelay(); // Increment counter
+      logic.onLanded(1000);
+      logic.updateLockDelay(1200); // 200ms経過
       logic.onFloated();
-      
-      // After floating, counter should be reset
-      logic.onLanded();
-      // First frame after landing should not immediately lock
-      // (unless LOCK_DELAY is 1)
-      expect(logic.isLanded()).toBe(true);
+
+      // 再着地後、時間がリセットされていることを確認
+      logic.onLanded(2000);
+      // 2000ms時点で着地、2499msではまだロックしない
+      expect(logic.updateLockDelay(2499)).toBe(false);
+      // 2500msでロック
+      expect(logic.updateLockDelay(2500)).toBe(true);
     });
 
     it('should reset state after resetLockState()', () => {
       const logic = new GameLogic();
-      logic.onLanded();
-      logic.updateLockDelay();
+      logic.onLanded(1000);
+      logic.updateLockDelay(1200);
       logic.resetLockState();
-      
+
       expect(logic.isLanded()).toBe(false);
     });
 
-    it('should not increment counter when not landed', () => {
+    it('should not lock when not landed', () => {
       const logic = new GameLogic();
-      // Not landed, updateLockDelay should not increment
-      const result = logic.updateLockDelay();
+      // Not landed, updateLockDelay should return false
+      const result = logic.updateLockDelay(1000);
       expect(result).toBe(false);
     });
   });

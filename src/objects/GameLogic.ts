@@ -7,14 +7,14 @@ export interface GameLogicOptions {
 export class GameLogic {
   private score: number;
   private landed: boolean;
-  private lockCounter: number;
+  private lockStartTime: number | null;
   private rng: () => number;
   private nextType: TetrominoType;
 
   constructor(options?: GameLogicOptions) {
     this.score = 0;
     this.landed = false;
-    this.lockCounter = 0;
+    this.lockStartTime = null;
     this.rng = options?.rng ?? Math.random;
     this.nextType = this.generateRandomType(); // 即時初期化で呼び出し順序に依存しない
   }
@@ -34,30 +34,32 @@ export class GameLogic {
     return this.score;
   }
 
-  onLanded(): void {
+  onLanded(currentTime: number): void {
     this.landed = true;
+    if (this.lockStartTime === null) {
+      this.lockStartTime = currentTime;
+    }
   }
 
   onFloated(): void {
     this.landed = false;
-    this.lockCounter = 0;
+    this.lockStartTime = null;
   }
 
   isLanded(): boolean {
     return this.landed;
   }
 
-  updateLockDelay(): boolean {
-    if (!this.landed) {
+  updateLockDelay(currentTime: number): boolean {
+    if (!this.landed || this.lockStartTime === null) {
       return false;
     }
-    this.lockCounter++;
-    return this.lockCounter >= LOCK_DELAY;
+    return (currentTime - this.lockStartTime) >= LOCK_DELAY;
   }
 
   resetLockState(): void {
     this.landed = false;
-    this.lockCounter = 0;
+    this.lockStartTime = null;
   }
 
   getNextTetrominoType(): TetrominoType {
